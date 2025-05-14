@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancreatic Tumor Detection</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Spectral|Rubik">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family:  Rubik, sans-serif;
+            color: white;
+            line-height: 1.5;
+            background-image: url("{{ url_for('static', filename='images/canvai.png') }}");
+            background-size: cover;  
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            background-position: center center;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .highlight {
+            color: orange;
+        }
+
+        img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: darkorange;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: darkorange;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            font-size: 19px; 
+            font-family:  Rubik, sans-serif;
+        }
+
+        .navbar ul {
+            display: flex;
+            list-style: none;
+        }
+
+        .navbar li {
+            margin-left: 20px;
+            color:rgb(0, 0, 0);
+        }
+
+        /* Main Section */
+        .main-section {
+            display: flex;
+            padding: 50px;
+        }
+
+        .left {
+            flex: 1;
+        }
+
+        .profiles {
+            margin-top: 20px;
+        }
+
+        .solutions-text p {
+            margin-top: 20px;
+        }
+
+        .right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .business-boost {
+            background-color:darkorange;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            left:240px;
+            bottom: 80px;
+        }
+
+        .business-boost p {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .demo-btn {
+            display: inline-block;
+            background: white;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .demo-btn:hover {
+            background: #ddd;
+        }
+
+        /* Footer */
+        footer {
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .services button {
+            margin-right: 10px;
+        }
+
+        /* Card Styles */
+        .cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .card {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #333;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card p {
+            margin-bottom: 10px;
+        }
+
+        .card:hover {
+            transform: scale(1.08); /* Enlarges the block */
+            box-shadow: 0px 10px 20px rgba(255, 255, 255, 0.2); /* Adds a glow effect */
+            z-index: 1;
+        }
+
+        /* Color-specific cards */
+        .orange {
+            background-color: rgba(39, 162, 223, 0.95);
+        }
+
+        .gray {
+            background-color:rgba(39, 162, 223, 0.95);
+        }
+
+        .yellow {
+            background-color:rgba(39, 162, 223, 0.95);
+        }
+
+        .stat {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .arrow{
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .icon{
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.74);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <h2>PANCREASCAN</h2>
+        </div>
+    </header>
+
+    <section class="main-section">
+        <div class="left">
+            <h1>PANCREATIC <span class="highlight">TUMOR</span> DETECTION</h1>
+            <div class="solutions-text">
+                <p>Early Detection Pancreatic Cancer is Your Road to Recovery and Saving Lives...</p>
+                <p>We Provide the Things to You...</p>
+            </div>
+            <div class="profiles">
+                <button onclick="openPopup()">Help</button>
+            </div>
+        </div>
+        <div class="right">
+            <div class="business-boost">
+                <p>Things To Know</p>
+                <a href="/thingstoknow" class="demo-btn">Click Here</a>
+            </div>
+        </div>
+        <div class="popup-overlay" id="popup">
+            <div class="popup-content">
+                <button class="close-btn" onclick="closePopup()">X</button>
+                <h2>Process Flow</h2>
+                <li><strong>CRITICALNESS:</strong>For criticalness you have to collect the required values in the blood test report and enter in the respective sections and find out the predicted result...</li>
+                <p></p>
+                <li><strong>IMAGE ANALYSIS:</strong>For image analysis you should have CT scan image and need to upload in the website and find out the predicted result...</li>
+                <p></p>
+                <li><strong>NEAREST HOSPITAL:</strong>For nearest hospital you have to find out the hospitals that are nearby using the maps provided and select the hospital it'll help you to navigate to the destination...</li> 
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="cards">
+            <a href="/criticalness" class="card orange">
+                <p>CRITICALNESS</p>
+                <div class="icon">➔</div>
+            </a>
+            <a href="/imageup" class="card gray">
+                <p>IMAGE ANALYSIS</p>
+                <div class="arrow">➔</div>
+            </a>
+            <a href="/nearest-hospital" class="card yellow"> 
+                <p>NEAREST HOSPITAL</p>
+                <div class="stat">➔</div>
+            </a>
+        </div>
+    </footer>
+    <script>
+        
+        function openPopup() {
+            document.getElementById("popup").style.display = "flex";
+        }
+    
+        
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+    
+        // Close the popup if the user clicks outside the content
+        window.onclick = function(event) {
+            let popup = document.getElementById("popup");
+            if (event.target === popup) {
+                popup.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pancreatic Cancer Prediction</title>
+    <style>
+        body{
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-color:#34495e;
+            
+            background-image: url("{{ url_for('static', filename='images/crit.png') }}");
+            background-size: cover;  
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            background-position: center center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color:rgb(2, 36, 47);
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color:rgb(0, 0, 0);
+        }
+
+        form {
+            background-color:rgb(161, 149, 106);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ecf0f1;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        button {
+            background-color: #27ae60;
+            color: white;
+            padding: 12px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #218c53;
+        }
+
+        #predictionResult {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <a href='/'>
+        <button class="home-btn" onclick="window.location.href='index.html'">←</button>
+    </a>
+    <h1>Pancreatic Tumor Prediction</h1>
+    <div class= "warn">
+    <p> Fill all the details to get a prediction </p>
+    </div>
+    <form id="predictionForm">
+        <label>Patient Cohort:</label>
+        <select id="patientCohort">
+            <option value="0">Cohort1</option>
+            <option value="1">Cohort2</option>
+        </select>
+
+        <label>Sample Origin:</label>
+        <select id="sampleOrigin">
+            <option value="0">BPTB</option>
+            <option value="1">LIV</option>
+            <option value="2">ESP</option>
+            <option value="3">UCL</option>
+        </select>
+
+        <label>Age:</label>
+        <input type="number" id="age" required>
+
+        <label>Sex:</label>
+        <select id="sex">
+            <option value="0">Female</option>
+            <option value="1">Male</option>
+        </select>
+
+        <label>Stage:</label>
+        <select id="stage">
+            <option value="0">0</option>
+            <option value="1">I</option>
+            <option value="2">IA</option>
+            <option value="3">IB</option>
+            <option value="4">II</option>
+            <option value="5">IIA</option>
+            <option value="6">IIB</option>
+            <option value="7">III</option>
+            <option value="8">IV</option>
+        </select>
+
+        <label>Benign Sample Diagnosis:</label>
+        <select id="diagnosis">
+            <option value="0">null</option>
+            <option value="1">Abdominal Pain</option>
+            <option value="2">Biliary Stricture</option>
+            <option value="3">Cholecystitis</option>
+            <option value="4">Gallstones</option>
+            <option value="5">Pancreatitis</option>
+        </select>
+
+        <label>Plasma CA19-9:</label>
+        <input type="text" id="plasmaCA199" required>
+
+        <label>Creatinine:</label>
+        <input type="text" id="creatinine" required>
+
+        <label>LYVE1:</label>
+        <input type="text" id="lyve1" required>
+
+        <label>REG1B:</label>
+        <input type="text" id="reg1b" required>
+
+        <label>TFF1:</label>
+        <input type="text" id="tff1" required>
+
+        <label>REG1A:</label>
+        <input type="text" id="reg1a" required>
+
+        <label>Model:</label>
+        <select id="model">
+            <option value="RandomForestClassifier">Random Forest</option>
+           <!-- <option value="naivebayes">Naive Bayes</option> -->
+        </select>
+
+        <button type="submit">Predict</button>
+    </form>
+    <h1 id="predictionResult"></h1>
+    <script>
+      document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+          event.preventDefault();
+          document.getElementById("predictionResult").innerText = "Processing...";
+      
+          // Collect data from form fields
+          const formData = {
+              patient_cohort: document.getElementById("patientCohort").value,
+              sample_origin: document.getElementById("sampleOrigin").value,
+              age: document.getElementById("age").value,
+              sex: document.getElementById("sex").value,
+              stage: document.getElementById("stage").value,
+              benign_sample_diagnosis: document.getElementById("diagnosis").value,
+              plasma_ca19_9: document.getElementById("plasmaCA199").value,
+              creatinine: document.getElementById("creatinine").value,
+              lyve1: document.getElementById("lyve1").value,
+              reg1b: document.getElementById("reg1b").value,
+              tff1: document.getElementById("tff1").value,
+              reg1a: document.getElementById("reg1a").value,
+              model: document.getElementById("model").value
+          };
+      
+          try {
+              const response = await fetch("http://127.0.0.1:5000/predict", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(formData)
+              });
+      
+              // Check if the response status is OK
+              if (response.ok) {
+                  const result = await response.json();
+                  document.getElementById("predictionResult").innerText = `Prediction: ${result.prediction}`;
+              } else {
+                  const errorResponse = await response.json();
+                  document.getElementById("predictionResult").innerText = `Error: ${errorResponse.error || "Unknown error"}`;
+              }
+          } catch (error) {
+              console.error('Error during prediction request:', error);  // Log error for debugging
+              document.getElementById("predictionResult").innerText = "Error processing prediction";
+          }
+      });
+      </script>
+      
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pancreatic Tumor Detection</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f1f1f1, #c2c2c2);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+
+      background-image: url("{{ url_for('static', filename='images/imageup.webp') }}");
+      background-size: cover;  
+      background-repeat: no-repeat; 
+      background-attachment: fixed; 
+      background-position: center center;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #1a1a1a;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color:rgb(92, 92, 92)
+    }
+
+    .headbox{
+      background: linear-gradient(135deg, #f1f1f1,rgba(194, 194, 194, 0.73));
+      padding: 15px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+      border-radius: 15px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.5); /* Dark transparent background */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 600px;
+    }
+
+    input[type="file"] {
+      background-color: #555;
+      color: white;
+      padding: 10px;
+      margin: 15px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 80%;
+      text-align: center;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #result img {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    #prediction {
+      margin-top: 20px;
+      font-size: 1.5rem;
+      color: white;
+      background-color: #28a745; /* Green background for result */
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 90%;
+      font-weight: bold;
+      text-align: center;
+      display: none; /* Initially hidden */
+    }
+
+    .home-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .home-btn:hover {
+        background-color: #45a049;
+    }
+  </style>
+  <script>
+    function previewImage() {
+      const fileInput = document.getElementById('imageInput');
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.innerHTML = '';
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function (e) {
+          const imgElement = document.createElement('img');
+          imgElement.src = e.target.result;  
+          resultDiv.appendChild(imgElement); 
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);  
+      }
+    }
+
+        // Handle the form submission to send the image for processing
+        async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const formData = new FormData();
+        const fileInput = document.getElementById('imageInput');
+        const resultDiv = document.getElementById('result');
+        const predictionDiv = document.getElementById('prediction'); 
+
+        
+        resultDiv.innerHTML = '';
+
+        if (fileInput.files.length === 0) {
+          predictionDiv.textContent = 'Please select an image.';
+          predictionDiv.style.display = 'block';
+          return;
+        }
+
+        formData.append('image', fileInput.files[0]);
+
+        try {
+          const response = await fetch('/process', {
+            method: 'POST',
+            body: formData
+          });
+          
+          const data = await response.json();
+          
+          predictionDiv.textContent = `Prediction: ${data.prediction}`;
+
+          if (data.prediction === 'Normal') {
+            predictionDiv.style.backgroundColor = '#28a745';  // Green for Normal
+          } else if (data.prediction === 'Pancreatic Tumor') {
+            predictionDiv.style.backgroundColor = '#dc3545';  // Red for Pancreatic Tumor
+          }
+
+          predictionDiv.style.display = 'block'; 
+          } catch (error) {
+          predictionDiv.textContent = 'An error occurred while processing the image.';
+          predictionDiv.style.display = 'block';
+          console.error(error);
+          }
+        }
+
+  </script>
+</head>
+<body>
+  <a href='/'>
+    <button class="home-btn" onclick="window.location.href='index.html'">←</button>
+  </a>
+
+  <div class='headbox'>
+  <h1>Pancreatic Tumor Detection</h1>
+  <h2>Upload CT Scan Image</h2>
+  </div>
+
+  <form id="imageForm" onsubmit="handleFormSubmit(event)">
+    <input type="file" id="imageInput" accept="image/*" required onchange="previewImage()">
+    <div id="result"></div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="prediction"></div>
+</body>
+</html>
